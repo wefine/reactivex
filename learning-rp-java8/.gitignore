@@ -1,6 +1,10 @@
 bin
 build
-.gradle/*
+.gradle
 .classpath
 .project
 cache
+
+*.ipr
+*.iws
+.idea
