@@ -1,0 +1,96 @@
+= Notes on Reactive Programming
+
+include::intro.adoc[leveloffset=+1]
+
+== Basics of Reactive Programming in Java
+
+include::flux.adoc[leveloffset=+1]
+
+== Concurrent Programming with Spring Reactive
+
+include::io.adoc[leveloffset=+1]
+
+== Appendix: Server Platform Comparison
+
+include::benchmarks.adoc[leveloffset=+1]
+
+TODO: more chat to tidy up
+
+```
+such a solution will only get you so far
+
+not to mention that it is still byte[]-based, and does not expose ByteBuffers in any way
+
+to be honest, there is no way to answer your question yet, as we haven’t done any serious performance testing. But we ​*expect*​ Netty to be a better fit, since its threading model is more close aligned to a reactive world. Servlet containers still use a one-thread-per-request model, even if you are using the async support
+
+so threading is reason one, exposing byte buffers is reason two for preferring netty
+
+David Syer [11:03 AM] 
+But buffers are just more efficient?
+
+Because of heap memory?
+
+Arjen Poutsma [11:03 AM] 
+yes
+
+and non-blockingness of the java.nio API
+```
+
+== The Role of Back Pressure
+
+* `subscribeOn()` allows a `Flux` to relay a slow publisher
+
+* `publishOn()` allows a `Flux` to have slow subscribers
+
+TODO: tidy this up...
+
+since callback is called for each subscriber you can use operators that share a context
+
+
+```
+Mono.defer( () -> {
+  AtomicInteger d = new AtomicNumber();     
+  return Mono.just(1)
+             .map(d::incrementAndGet)
+             .doOnError(d::decrementAndGet);
+})
+```
+
+`d` here is scoped for a given `Subscriber` that can be useful
+
+== Don't Be the Bottleneck
+
+Microbenchmarks always show that, as long as no-one blocks a thread, data flows faster if we match the number of threads to the number of cores (possibly with an extra core dispatching thread). That's why the thread pools created by Reactor by default limit themselves to the number of available processors, and it's why Reactor is frugal with threads, never jumping a thread boundary unless explicitly instructed.
+
+Do you need to know all this stuff? Possibly not. You can be the bottleneck, if you are confident that you are no worse than your downstream dependencies. You might as well stick with plain old imperative programming and synchronous request-response. Use a few background threads to grease your way a bit. The result is easier to understand and easier to operationalize.
+
+== Links
+
+http://blog.paralleluniverse.co/2014/02/20/reactive/[Parallel universe blog on Reactive]
+
+http://www.javaworld.com/article/2071370/core-java/of-fibers-and-continuations.html[Of Fibers and Continuations | JavaWorld]
+
+Readable (but unfortunately database-biased) article:
+http://news.dice.com/2014/01/13/how-is-reactive-different-from-procedural-programming/[How is Reactive Programming Different?]
+
+Propaganda: 
+http://www.reactivemanifesto.org/[The Reactive Manifesto]
+
+http://www.reactive-streams.org/[Reactive Streams]
+
+Blog from RxJava lead http://akarnokd.blogspot.co.uk/[David Karnok] including the one on http://akarnokd.blogspot.co.uk/2016/03/operator-fusion-part-1.html[Generations of Reactive]
+
+https://github.com/reactor/reactive-streams-commons/issues/21[Reactive Gems] github issue with documentation of lots of use cases
+
+https://en.wikipedia.org/wiki/Continuation(which you can think of as state)[Continuation - Wikipedia]
+
+A multilingual framework (including Java):
+https://github.com/kentuckyfriedtakahe/sodium[Sodium - GitHub]
+
+http://docs.oracle.com/javase/tutorial/essential/concurrency/forkjoin.html[Fork-join docs at Oracle]
+
+Sebastien Deleuze's https://spring.io/blog/2016/04/19/understanding-reactive-types[Reactive Types] Blog
+
+https://lmax-exchange.github.io/disruptor/[LMAX Disruptor]
+
+https://robharrop.github.io/[Rob Harrop's Blog]
