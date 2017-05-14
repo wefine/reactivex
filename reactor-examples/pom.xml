@@ -8,8 +8,10 @@
     <artifactId>reactor-examples</artifactId>
     <packaging>pom</packaging>
     <version>1.0</version>
+
     <modules>
         <module>reactor-getstart</module>
+        <module>lite-rx-api-hands-on</module>
     </modules>
 
 
@@ -19,12 +21,6 @@
             <artifactId>reactor-core</artifactId>
             <version>3.0.7.RELEASE</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/io.projectreactor/reactor-bus -->
-        <!--<dependency>-->
-            <!--<groupId>io.projectreactor.addons</groupId>-->
-            <!--<artifactId>reactor-bus</artifactId>-->
-            <!--<version>3.0.7.RELEASE</version>-->
-        <!--</dependency>-->
 
         <!-- https://mvnrepository.com/artifact/io.projectreactor/reactor-bus -->
         <dependency>
